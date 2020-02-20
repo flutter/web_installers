@@ -138,6 +138,6 @@ class ChromeDriverInstaller {
   }
 
   Future<void> runDriver() async {
-    await io.Process.run('chromedriver', <String>['--port=4444']);
+    await io.Process.run('chromedriver/chromedriver', <String>['--port=4444']);
   }
 }
