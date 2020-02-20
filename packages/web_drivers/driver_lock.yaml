@@ -1,0 +1,7 @@
+
+## Driver version to use for each browser version.
+## See: https://chromedriver.chromium.org/downloads
+chrome:
+  81: '81.0.4044.20'
+  80: '80.0.3987.106'
+  79: '79.0.3945.36'
