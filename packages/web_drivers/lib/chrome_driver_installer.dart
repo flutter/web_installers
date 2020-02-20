@@ -4,14 +4,13 @@
 
 import 'dart:io' as io;
 
-import 'package:args/command_runner.dart';
 import 'package:http/http.dart';
 import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart';
 
-import 'common.dart';
+import 'src/common.dart';
 
-class ChromeDriverCommand extends Command<bool> {
+class ChromeDriverInstaller {
   /// HTTP client used to download Chrome Driver.
   final Client client = Client();
 
@@ -30,12 +29,6 @@ class ChromeDriverCommand extends Command<bool> {
 
   String get downloadUrl =>
       '$chromeDriverUrl$chromeDriverVersion/chromedriver_linux64.zip';
-
-  @override
-  String get description => 'Chrome Driver installer.';
-
-  @override
-  String get name => 'chromedriver';
 
   bool get isInstalled =>
       io.File(path.join(driverDir.path, 'chromedriver')).existsSync();

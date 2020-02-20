@@ -7,7 +7,7 @@
 import 'dart:io' as io;
 
 import 'package:test/test.dart';
-import 'package:web_driver_installer/chrome_driver.dart';
+import 'package:web_driver_installer/chrome_driver_installer.dart';
 
 void main() async {
   void deleteInstallationIfExists() {
@@ -27,7 +27,7 @@ void main() async {
   });
 
   test('installs chrome driver', () async {
-    ChromeDriverCommand command = ChromeDriverCommand();
+    ChromeDriverInstaller command = ChromeDriverInstaller();
     expect(command.isInstalled, isFalse);
     await command.install();
 

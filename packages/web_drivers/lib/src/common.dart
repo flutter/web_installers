@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+library common;
+
 import 'dart:io' as io;
 
 import 'package:yaml/yaml.dart';
@@ -9,7 +11,7 @@ import 'package:yaml/yaml.dart';
 /// Provides access to the contents of the `driver_lock.yaml` file.
 class DriverLock {
   DriverLock._() {
-    final io.File lockFile = io.File('driver_lock.yaml');
+    final io.File lockFile = io.File('driver_version.yaml');
     _configuration = loadYaml(lockFile.readAsStringSync()) as YamlMap;
   }
 

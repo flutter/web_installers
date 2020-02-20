@@ -6,7 +6,7 @@ import 'dart:io' as io;
 
 import 'package:args/command_runner.dart';
 
-import 'chrome_driver.dart';
+import 'chrome_driver_command.dart';
 
 CommandRunner runner = CommandRunner<bool>(
   'webdriver-install',
