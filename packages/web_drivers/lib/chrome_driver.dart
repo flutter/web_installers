@@ -21,7 +21,7 @@ class ChromeDriverCommand extends Command<bool> {
   /// File that should contain Chrome Driver.
   io.File exitingFile;
 
-  static const String chromerDriversUrl =
+  static const String chromeDriverUrl =
       'https://chromedriver.storage.googleapis.com/';
 
   String chromeDriverVersion;
@@ -29,7 +29,7 @@ class ChromeDriverCommand extends Command<bool> {
   io.File driverDownload;
 
   String get downloadUrl =>
-      '$chromerDriversUrl$chromeDriverVersion/chromedriver_linux64.zip';
+      '$chromeDriverUrl$chromeDriverVersion/chromedriver_linux64.zip';
 
   @override
   String get description => 'Chrome Driver installer.';
