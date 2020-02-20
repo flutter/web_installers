@@ -1,5 +1,5 @@
 
-## Driver version to use for each browser version.
+## Map for driver versions to use for each browser version.
 ## See: https://chromedriver.chromium.org/downloads
 chrome:
   81: '81.0.4044.20'
