@@ -13,15 +13,31 @@ class ChromeDriverCommand extends Command<bool> {
   @override
   String get name => 'chromedriver';
 
-  final ChromeDriverInstaller chromeDriverInstaller = ChromeDriverInstaller();
-
-  // Trigger Chrome Driver start.
-  Future<void> start() async {
-    await chromeDriverInstaller.start();
+  ChromeDriverCommand() {
+    argParser
+      ..addFlag(
+        'install-only',
+        defaultsTo: false,
+        help: 'Only installs the driver. Does not start it. Default is false',
+      );
   }
 
-  // Trigger Chrome Driver install.
-  Future<bool> install() async {
-    return await chromeDriverInstaller.install();
+  final ChromeDriverInstaller chromeDriverInstaller = ChromeDriverInstaller();
+
+  @override
+  Future<bool> run() async {
+    final bool installOnly = argResults['install-only'];
+
+    if (installOnly) {
+      return await chromeDriverInstaller.install();
+    } else {
+      try {
+        await chromeDriverInstaller.start();
+      } catch (e) {
+        print('Exception during install $e');
+        return false;
+      }
+      return true;
+    }
   }
 }
