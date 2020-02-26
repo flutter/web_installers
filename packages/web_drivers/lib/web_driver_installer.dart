@@ -15,10 +15,16 @@ CommandRunner runner = CommandRunner<bool>(
 )..addCommand(ChromeDriverCommand());
 
 void main(List<String> args) async {
-  // TODO(nurhan): Start/only install driver depending on arg.
   // TODO(nurhan): Add more browsers' drivers. Control with command line args.
   try {
-    await ChromeDriverCommand().start();
+    // For now add chromedriver if no argument exists. This is not to break
+    // exisiting tests.
+    // TODO(nurhan): Fix smoke test in flutter to pass chromedriver as an arg.
+    if(args == null || args.length ==0) {
+      await runner.run(List<String>()..add('chromedriver'));
+    } else {
+      await runner.run(args);
+    }
   } on UsageException catch (e) {
     print(e);
     io.exit(64); // Exit code 64 indicates a usage error.
