@@ -60,7 +60,7 @@ class ChromeDriverInstaller {
     bool successfulInstall = false;
     final int chromeVersion = await _querySystemChromeVersion();
 
-    if (chromeVersion == null || chromeVersion < 79) {
+    if (chromeVersion == null || chromeVersion < 78) {
       throw Exception('Unsupported Chrome version: $chromeVersion');
     }
 
