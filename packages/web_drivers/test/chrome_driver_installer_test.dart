@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-@TestOn('vm && linux')
-
 import 'dart:io' as io;
 
 import 'package:test/test.dart';
@@ -33,4 +31,14 @@ void main() async {
 
     expectLater(command.isInstalled, isTrue);
   });
+
+  test('get chrome version on MacOS', () async {
+    String executable =
+        await ChromeDriverInstaller().findChromeExecutableOnMac();
+    final io.ProcessResult processResult =
+        await io.Process.run(executable, <String>['--version']);
+
+    expect(processResult.exitCode, 0);
+    expect(processResult.stdout.toString().startsWith('Google Chrome'), isTrue);
+  }, skip: !io.Platform.isMacOS);
 }
