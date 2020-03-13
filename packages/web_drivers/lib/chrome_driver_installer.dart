@@ -7,7 +7,6 @@ import 'dart:io' as io;
 import 'package:http/http.dart';
 import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart';
-import 'package:strings/strings.dart';
 
 import 'src/common.dart';
 
@@ -112,19 +111,18 @@ class ChromeDriverInstaller {
 
   /// Find Google Chrome App on Mac.
   Future<String> findChromeExecutableOnMac() async {
-    final io.ProcessResult processResult = await io.Process.run('find',
-        <String>['/Applications', '-type', 'd', '-name', '*Chrome.app']);
+    io.Directory chromeDirectory = io.Directory('/Applications')
+        .listSync()
+        .whereType<io.Directory>()
+        .firstWhere(
+          (d) => path.basename(d.path).endsWith('Chrome.app'),
+          orElse: () => throw Exception('Failed to locate system Chrome'),
+        );
 
-    if (processResult.exitCode != 0) {
-      throw Exception('Failed to locate system Chrome.');
-    }
-    // The output looks like: /Applications/Google Chrome.app
-    String output = processResult.stdout as String;
-    output = output.trim();
+    final io.File chromeExecutableDir = io.File(
+        path.join(chromeDirectory.path, 'Contents', 'MacOS', 'Google Chrome'));
 
-    String chromeExecutable = '${output}\/Contents\/MacOS\/Google Chrome';
-    chromeExecutable = escape(chromeExecutable);
-    return chromeExecutable;
+    return chromeExecutableDir.path;
   }
 
   Future<io.File> _downloadDriver() async {
