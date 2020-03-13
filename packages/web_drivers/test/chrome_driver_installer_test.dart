@@ -33,4 +33,13 @@ void main() async {
 
     expectLater(command.isInstalled, isTrue);
   });
+
+  test('get chrome version', () async {
+    String executable = await ChromeDriverInstaller().findChromeExecutableOnMac();
+    final io.ProcessResult processResult =
+        await io.Process.run(executable, <String>['--version']);
+
+    expect(processResult.exitCode, 0);
+    expect(processResult.stdout.toString().startsWith('Google Chrome'), isTrue);
+  });
 }

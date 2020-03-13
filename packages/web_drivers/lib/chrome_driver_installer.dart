@@ -7,6 +7,7 @@ import 'dart:io' as io;
 import 'package:http/http.dart';
 import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart';
+import 'package:strings/strings.dart';
 
 import 'src/common.dart';
 
@@ -28,7 +29,7 @@ class ChromeDriverInstaller {
   io.File driverDownload;
 
   String get downloadUrl =>
-      '$chromeDriverUrl$chromeDriverVersion/chromedriver_linux64.zip';
+      '$chromeDriverUrl$chromeDriverVersion/${driverName()}';
 
   bool get isInstalled =>
       io.File(path.join(driverDir.path, 'chromedriver')).existsSync();
@@ -83,8 +84,17 @@ class ChromeDriverInstaller {
   }
 
   Future<int> _querySystemChromeVersion() async {
+    String chromeExecutable = '';
+    if (io.Platform.isLinux) {
+      chromeExecutable = 'google-chrome';
+    } else if (io.Platform.isMacOS) {
+      chromeExecutable = await findChromeExecutableOnMac();
+    } else {
+      throw UnimplementedError('Web installers only work on Linux and Mac.');
+    }
+
     final io.ProcessResult versionResult =
-        await io.Process.run('google-chrome', <String>['--version']);
+        await io.Process.run('$chromeExecutable', <String>['--version']);
 
     if (versionResult.exitCode != 0) {
       throw Exception('Failed to locate system Chrome.');
@@ -98,6 +108,23 @@ class ChromeDriverInstaller {
     final String versionNo = versionAsString.split('.')[0];
 
     return int.parse(versionNo);
+  }
+
+  /// Find Google Chrome App on Mac.
+  Future<String> findChromeExecutableOnMac() async {
+    final io.ProcessResult processResult = await io.Process.run('find',
+        <String>['/Applications', '-type', 'd', '-name', '*Chrome.app']);
+
+    if (processResult.exitCode != 0) {
+      throw Exception('Failed to locate system Chrome.');
+    }
+    // The output looks like: /Applications/Google Chrome.app
+    String output = processResult.stdout as String;
+    output = output.trim();
+
+    String chromeExecutable = '${output}\/Contents\/MacOS\/Google Chrome';
+    chromeExecutable = escape(chromeExecutable);
+    return chromeExecutable;
   }
 
   Future<io.File> _downloadDriver() async {
@@ -115,7 +142,7 @@ class ChromeDriverInstaller {
     ));
 
     final io.File downloadedFile =
-        io.File(path.join(driverDir.path, 'chromedriver_linux64.zip'));
+        io.File(path.join(driverDir.path, driverName()));
     await download.stream.pipe(downloadedFile.openWrite());
 
     return downloadedFile;
@@ -139,5 +166,22 @@ class ChromeDriverInstaller {
 
   Future<void> runDriver() async {
     await io.Process.run('chromedriver/chromedriver', <String>['--port=4444']);
+  }
+
+  /// Driver name for operating system.
+  ///
+  /// Chrome provide 3 different drivers per version. As an example, see:
+  /// https://chromedriver.storage.googleapis.com/index.html?path=76.0.3809.126/
+  static String driverName() {
+    if (io.Platform.isMacOS) {
+      return 'chromedriver_mac64.zip';
+    } else if (io.Platform.isLinux) {
+      return 'chromedriver_linux64.zip';
+    } else if (io.Platform.isWindows) {
+      return 'chromedriver_win32.zip';
+    } else {
+      throw UnimplementedError('Automated testing not supported on this OS.'
+          'Platform name: ${io.Platform.operatingSystem}');
+    }
   }
 }
