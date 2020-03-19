@@ -101,6 +101,8 @@ class ChromeDriverInstaller {
     // The output looks like: Google Chrome 79.0.3945.36.
     final String output = versionResult.stdout as String;
 
+    print('INFO: chrome version in use $output');
+
     // Version number such as 79.0.3945.36.
     final String versionAsString = output.split(' ')[2];
 
