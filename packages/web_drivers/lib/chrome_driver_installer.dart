@@ -30,42 +30,61 @@ class ChromeDriverInstaller {
   String get downloadUrl =>
       '$chromeDriverUrl$chromeDriverVersion/${driverName()}';
 
-  bool get isInstalled =>
-      io.File(path.join(driverDir.path, 'chromedriver')).existsSync();
+  io.File get installation =>
+      io.File(path.join(driverDir.path, 'chromedriver'));
 
-  Future<void> start() async {
+  bool get isInstalled => installation.existsSync();
+
+  ChromeDriverInstaller() : this.chromeDriverVersion = '';
+
+  ChromeDriverInstaller.withVersion(String version)
+      : this.chromeDriverVersion = version;
+
+  Future<void> start({bool alwaysInstall = false}) async {
     // Install Chrome Driver.
     try {
-      final bool isSuccessfullyInstalled = await install();
-      if (isSuccessfullyInstalled) {
-        // Start using chromedriver --port=4444
-        print('starting Chrome Driver on port 4444');
-        await runDriver();
-      }
+      await install(alwaysInstall: alwaysInstall);
+      // Start using chromedriver --port=4444
+      print('INFO: Starting Chrome Driver on port 4444');
+      await runDriver();
     } finally {
-      driverDownload?.deleteSync();
+      // Only delete if the user is planning to override the installs.
+      // Keeping the existing version might make local development easier.
+      // Also if a CI build runs multiple felt commands using an existing
+      // version speeds up the build.
+      if (!alwaysInstall) {
+        driverDownload?.deleteSync();
+      }
     }
   }
 
-  Future<bool> install() async {
-    if (!isInstalled) {
-      return await _installDriver();
+  void install({bool alwaysInstall = false}) async {
+    if (!isInstalled || alwaysInstall) {
+      await _installDriver();
     } else {
-      return true;
+      print('INFO: Installation skipped. The driver is installed: '
+          '$isInstalled. User requested force install: $alwaysInstall');
     }
   }
 
-  Future<bool> _installDriver() async {
-    // Check chrome version.
-    bool successfulInstall = false;
-    final int chromeVersion = await _querySystemChromeVersion();
-
-    if (chromeVersion == null || chromeVersion < 78) {
-      throw Exception('Unsupported Chrome version: $chromeVersion');
+  void _installDriver() async {
+    // If this method is called, clean the previous installations.
+    if (isInstalled) {
+      installation.deleteSync(recursive: true);
     }
 
-    final YamlMap browserLock = DriverLock.instance.configuration;
-    chromeDriverVersion = browserLock['chrome'][chromeVersion] as String;
+    // Figure out which driver version to install if it's not given during
+    // initialization.
+    if (chromeDriverVersion.isEmpty) {
+      final int chromeVersion = await _querySystemChromeVersion();
+
+      if (chromeVersion == null || chromeVersion < 74) {
+        throw Exception('Unsupported Chrome version: $chromeVersion');
+      }
+
+      final YamlMap browserLock = DriverLock.instance.configuration;
+      chromeDriverVersion = browserLock['chrome'][chromeVersion] as String;
+    }
 
     try {
       driverDownload = await _downloadDriver();
@@ -77,9 +96,6 @@ class ChromeDriverInstaller {
     }
 
     await _uncompress();
-    successfulInstall = true;
-
-    return successfulInstall;
   }
 
   Future<int> _querySystemChromeVersion() async {
