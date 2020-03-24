@@ -30,10 +30,17 @@ class ChromeDriverInstaller {
   String get downloadUrl =>
       '$chromeDriverUrl$chromeDriverVersion/${driverName()}';
 
-  bool get isInstalled =>
-      io.File(path.join(driverDir.path, 'chromedriver')).existsSync();
+  io.File get installation =>
+      io.File(path.join(driverDir.path, 'chromedriver'));
 
-  Future<void> start() async {
+  bool get isInstalled => installation.existsSync();
+
+  ChromeDriverInstaller() : this.chromeDriverVersion = '';
+
+  ChromeDriverInstaller.withVersion(String version)
+      : this.chromeDriverVersion = version;
+
+  Future<void> start({bool alwaysInstall = false}) async {
     // Install Chrome Driver.
     try {
       final bool isSuccessfullyInstalled = await install();
@@ -43,12 +50,16 @@ class ChromeDriverInstaller {
         await runDriver();
       }
     } finally {
-      driverDownload?.deleteSync();
+      // Only delete if the user is planning to override the installs.
+      // Keeping the existing version might make local development easier.
+      if (!alwaysInstall) {
+        driverDownload?.deleteSync();
+      }
     }
   }
 
-  Future<bool> install() async {
-    if (!isInstalled) {
+  Future<bool> install({bool alwaysInstall = false}) async {
+    if (!isInstalled || alwaysInstall) {
       return await _installDriver();
     } else {
       return true;
@@ -56,16 +67,26 @@ class ChromeDriverInstaller {
   }
 
   Future<bool> _installDriver() async {
-    // Check chrome version.
-    bool successfulInstall = false;
-    final int chromeVersion = await _querySystemChromeVersion();
-
-    if (chromeVersion == null || chromeVersion < 78) {
-      throw Exception('Unsupported Chrome version: $chromeVersion');
+    // If this method is called, clean the previous installations.
+    if (isInstalled) {
+      installation.deleteSync(recursive: true);
     }
 
-    final YamlMap browserLock = DriverLock.instance.configuration;
-    chromeDriverVersion = browserLock['chrome'][chromeVersion] as String;
+    // Check chrome version.
+    bool successfulInstall = false;
+
+    // Figure out which driver version to install if it's not given during
+    // initialization.
+    if (chromeDriverVersion.isEmpty) {
+      final int chromeVersion = await _querySystemChromeVersion();
+
+      if (chromeVersion == null || chromeVersion < 74) {
+        throw Exception('Unsupported Chrome version: $chromeVersion');
+      }
+
+      final YamlMap browserLock = DriverLock.instance.configuration;
+      chromeDriverVersion = browserLock['chrome'][chromeVersion] as String;
+    }
 
     try {
       driverDownload = await _downloadDriver();

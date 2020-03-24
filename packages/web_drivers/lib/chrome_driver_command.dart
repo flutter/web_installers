@@ -13,20 +13,36 @@ class ChromeDriverCommand extends Command<bool> {
   @override
   String get name => 'chromedriver';
 
+  final String defaultDriverVersion = 'fromlockfile';
+
   ChromeDriverCommand() {
     argParser
+      ..addFlag('always-install',
+          defaultsTo: false,
+          help: 'There might be an already installed version of the driver. '
+              'If one wants to override it, set this flag')
       ..addFlag(
         'install-only',
         defaultsTo: false,
         help: 'Only installs the driver. Does not start it. Default is false',
-      );
+      )
+      ..addOption('driver-version',
+          defaultsTo: defaultDriverVersion,
+          help: 'Install the given version of the driver. If driver version is '
+              'not provided use version from the driver_version.yaml.');
   }
 
-  final ChromeDriverInstaller chromeDriverInstaller = ChromeDriverInstaller();
+  /// If the version is provided as an argument, initialize using the version
+  /// otherwise use the `driver_version.yaml` file.
+  ///
+  /// See [_initializeChromeDriverInstaller].
+  ChromeDriverInstaller chromeDriverInstaller;
 
   @override
   Future<bool> run() async {
     final bool installOnly = argResults['install-only'];
+
+    _initializeChromeDriverInstaller();
 
     if (installOnly) {
       return await chromeDriverInstaller.install();
@@ -38,6 +54,15 @@ class ChromeDriverCommand extends Command<bool> {
         return false;
       }
       return true;
+    }
+  }
+
+  void _initializeChromeDriverInstaller() {
+    final String driverVersion = argResults['driver-version'];
+    if (driverVersion == defaultDriverVersion) {
+      chromeDriverInstaller = ChromeDriverInstaller();
+    } else {
+      chromeDriverInstaller = ChromeDriverInstaller.withVersion(driverVersion);
     }
   }
 }
