@@ -2,8 +2,8 @@
 
 dart lib/web_driver_installer.dart chromedriver &
 
-# Chrome Driver versions are stored in driver_lock.yaml. Driver version can also
-# be given as an argument.
+# Chrome Driver versions are stored in driver_version.yaml.yaml. Driver version
+# can also be given as an argument.
 
 dart lib/web_driver_installer.dart chromedriver --driver-version="78.0.3904.105"
 
