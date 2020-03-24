@@ -20,7 +20,7 @@ class ChromeDriverCommand extends Command<bool> {
       ..addFlag('always-install',
           defaultsTo: false,
           help: 'There might be an already installed version of the driver. '
-              'If one wants to override it, set this flag')
+              'If one wants to overwrite it, set this flag')
       ..addFlag(
         'install-only',
         defaultsTo: false,
@@ -41,19 +41,20 @@ class ChromeDriverCommand extends Command<bool> {
   @override
   Future<bool> run() async {
     final bool installOnly = argResults['install-only'];
+    final bool alwaysInstall = argResults['always-install'];
 
     _initializeChromeDriverInstaller();
 
-    if (installOnly) {
-      return await chromeDriverInstaller.install();
-    } else {
-      try {
-        await chromeDriverInstaller.start();
-      } catch (e) {
-        print('Exception during install $e');
-        return false;
+    try {
+      if (installOnly) {
+        await chromeDriverInstaller.install(alwaysInstall: alwaysInstall);
+      } else {
+        await chromeDriverInstaller.start(alwaysInstall: alwaysInstall);
       }
       return true;
+    } catch (e) {
+      print('Exception during install $e');
+      return false;
     }
   }
 
