@@ -7,12 +7,15 @@ import 'dart:io' as io;
 import 'package:args/command_runner.dart';
 
 import 'chrome_driver_command.dart';
+import 'safari_driver_command.dart';
 
 CommandRunner runner = CommandRunner<bool>(
   'webdriver-install',
   'Command-line utility for installing web drivers for web integration tests '
       'with flutter driver.',
-)..addCommand(ChromeDriverCommand());
+)
+  ..addCommand(ChromeDriverCommand())
+  ..addCommand(SafariDriverCommand());
 
 void main(List<String> args) async {
   // TODO(nurhan): Add more browsers' drivers. Control with command line args.
@@ -20,7 +23,7 @@ void main(List<String> args) async {
     // For now add chromedriver if no argument exists. This is not to break
     // exisiting tests.
     // TODO(nurhan): Fix smoke test in flutter to pass chromedriver as an arg.
-    if(args == null || args.length ==0) {
+    if (args == null || args.length == 0) {
       await runner.run(List<String>()..add('chromedriver'));
     } else {
       await runner.run(args);

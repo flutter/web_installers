@@ -18,6 +18,15 @@
 
 ```dart lib/web_driver_installer.dart chromedriver --install-only```
 
+**To enable and start Safari Driver.**
+
+```dart lib/web_driver_installer.dart safaridriver```
+
+**Start a specific version of the driver.**
+This will end with an error if the exiting verison differs from the system version. This is useful for failing fast when on running on CI environments to see if the expected version is installed.
+
+```dart lib/web_driver_installer.dart safaridriver --driver-version="13.0.5"```
+
 **No-options also currently defaults to install and start Chrome Driver. It will be deprecated soon.**
 
 ```dart lib/web_driver_installer.dart &```
