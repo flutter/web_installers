@@ -23,7 +23,7 @@ void main(List<String> args) async {
     // For now add chromedriver if no argument exists. This is not to break
     // exisiting tests.
     // TODO(nurhan): Fix smoke test in flutter to pass chromedriver as an arg.
-    if (args == null || args.length == 0) {
+    if (args == null || args.isEmpty) {
       await runner.run(List<String>()..add('chromedriver'));
     } else {
       await runner.run(args);

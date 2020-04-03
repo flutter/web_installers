@@ -1,19 +1,23 @@
-/// Running Safari Driver which comes installed in every MacOS operation system.
+// Copyright 2020 The Flutter Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+import 'dart:io' as io;
+
+/// Running Safari Driver which comes installed in every macOS operation system.
 ///
 /// The version of driver is the same as the version of the Safari installed
 /// in the system.
-import 'dart:io' as io;
-
 class SafariDriverRunner {
-  /// Start Safari Driver installed in the MacOS operating system.
+  /// Start Safari Driver installed in the macOS operating system.
   ///
   /// If a specific version is requested, it will check the existing system
   /// version and throw and exception the versions do not match.
   ///
-  /// If the operating system is not MacOS, the method will throw an exception.
+  /// If the operating system is not macOS, the method will throw an exception.
   Future<void> start({String version}) async {
     if (!io.Platform.isMacOS) {
-      throw AssertionError('The operating system should be MacOS: '
+      throw AssertionError('The operating system must be MacOS: '
           '${io.Platform.operatingSystem}');
     }
     final io.Process process = await runDriver(version: version);
@@ -29,17 +33,17 @@ class SafariDriverRunner {
   ///
   /// The enabling waits for user input for authentication.
   void _enableDriver() {
-    io.Process.runSync('//usr/bin/safaridriver', ['--enable']);
+    io.Process.runSync('/usr/bin/safaridriver', ['--enable']);
   }
 
   /// Compare the version of the installed driver to the requested version.
   ///
   /// Throw an exception if they don't match.
   Future<void> _compareDriverVersion(String version) async {
-    io.Process.run('//usr/bin/safaridriver', ['--version']);
+    io.Process.run('/usr/bin/safaridriver', ['--version']);
 
     final io.ProcessResult versionResult =
-        await io.Process.run('//usr/bin/safaridriver', ['--version']);
+        await io.Process.run('/usr/bin/safaridriver', ['--version']);
 
     if (versionResult.exitCode != 0) {
       throw Exception('Failed to get the safari driver version.');
@@ -55,15 +59,15 @@ class SafariDriverRunner {
     final String versionAsString = rest.trim().split(' ')[1];
 
     if (versionAsString != version) {
-      throw Exception('System version $versionAsString not match requested '
+      throw Exception('System version $versionAsString did not match requested '
           'version $version');
     }
   }
 
-  /// Run Safari Driver installed in the MacOS operating system and return
-  /// the Process.
+  /// Run Safari Driver installed in the macOS operating system and return
+  /// the driver Process.
   ///
-  /// Returns a [:Future<Process>:] that completes with a
+  /// Returns a `Future<Process>` that completes with a
   /// Process instance when the process has been successfully
   /// started. That [Process] object can be used to interact with the
   /// process. If the process cannot be started the returned [Future]
@@ -83,6 +87,6 @@ class SafariDriverRunner {
       print('INFO: Safari Driver will start on port 4444.');
     }
 
-    return io.Process.start('//usr/bin/safaridriver', ['--port=4444']);
+    return io.Process.start('/usr/bin/safaridriver', ['--port=4444']);
   }
 }

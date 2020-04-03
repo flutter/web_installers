@@ -23,7 +23,7 @@
 ```dart lib/web_driver_installer.dart safaridriver```
 
 **Start a specific version of the driver.**
-This will end with an error if the exiting verison differs from the system version. This is useful for failing fast when on running on CI environments to see if the expected version is installed.
+This will end with an error if the exiting version differs from the system version. This is useful for failing fast when running on CI environments to see if the expected version is installed.
 
 ```dart lib/web_driver_installer.dart safaridriver --driver-version="13.0.5"```
 
