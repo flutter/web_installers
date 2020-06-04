@@ -1,0 +1,5 @@
+name: simulators
+description: For creating and managing iOS simulators.
+
+environment:
+  sdk: ">=2.2.2 <3.0.0"
