@@ -4,12 +4,23 @@
 
 import 'dart:io' as io;
 
-/// Creates/boots/shutsdown/lists iOS Simulators.
+/// Manages iOS Simulators.
+///
+/// Creates a simulator or provides access to an existing simulator by
+/// returning [IOSSimulator] instances.
 ///
 /// Uses `xcrun simctl` command to manage the simulators.
 ///
 /// Run `xcrun simctl --help` to learn more on the details of this tool.
 class IosSimulatorManager {
+  IosSimulatorManager() {
+    if (!io.Platform.isMacOS) {
+      throw Exception('Platform ${io.Platform.operatingSystem} is not supported'
+          '. This class should only be used on MacOS. It uses xcrun '
+          'simctl command line tool to manage the iOS simulators');
+    }
+  }
+
   /// Uses `xcrun simctl create` command to create an iOS Simulator.
   ///
   /// Runs `xcrun simctl list runtimes` to list the runtimes existing on your
@@ -75,48 +86,20 @@ class IosSimulatorManager {
 
     // Output will have the simulator id.
     final String simulatorId = createResult.stdout as String;
-    return IosSimulator(false, simulatorId.trim());
+    return IosSimulator._(false, simulatorId.trim());
   }
 
-  /// Boots the iOS Simulator that's id is given.
+  /// Returns an [IosSimulator] instance to control the simulator,
+  /// if a simulator corresponding to given [osVersion] and [phone] information
+  /// exits.
   ///
-  /// Uses `xcrun simctl boot` command to boot an iOS Simulator.
-  ///
-  /// If it is already booted the command will fail.
-  Future<void> bootSimulator(String simulatorId) async {
-    final io.ProcessResult versionResult =
-        await io.Process.run('xcrun', ['simctl', 'boot', '$simulatorId']);
-
-    if (versionResult.exitCode != 0) {
-      throw Exception('Failed to boot iOS simulators with id: $simulatorId.');
-    }
-
-    return;
-  }
-
-  /// Shutsdown the iOS Simulator that's id is given.
-  ///
-  /// Uses `xcrun simctl shutdown` command to boot an iOS Simulator.
-  ///
-  /// If the simulator is not booted, the command will fail.
-  Future<void> shutdownSimulator(String simulatorId) async {
-    final io.ProcessResult versionResult =
-        await io.Process.run('xcrun', ['simctl', 'shutdown', '$simulatorId']);
-
-    if (versionResult.exitCode != 0) {
-      throw Exception(
-          'Failed to shutdown iOS simulators with id: $simulatorId.');
-    }
-
-    return;
-  }
-
-  Future<IosSimulator> getSimulatorInfo(
+  /// Throws if such a simulator is not available.
+  Future<IosSimulator> getSimulator(
       int osMajorVersion, int osMinorVersion, String phone) async {
     final String simulatorVersion =
         '-- iOS ${osMajorVersion}.${osMinorVersion} --';
     final String simulatorsList =
-        await listExistingSimulators(osMajorVersion, osMinorVersion);
+        await _listExistingSimulators(osMajorVersion, osMinorVersion);
 
     // The simulator list, have the version string followed by a list of phone
     // names along with their ids and their statuses. Example output:
@@ -153,10 +136,10 @@ class IosSimulatorManager {
     final String phoneInfoAfterId = phoneInfo.substring(endIndexOfPhoneId + 1);
     final String simulatorStatus = phoneInfoAfterId.substring(
         phoneInfoAfterId.indexOf('(') + 1, phoneInfoAfterId.indexOf(')'));
-    return IosSimulator(simulatorStatus == 'Booted', simulatorId);
+    return IosSimulator._(simulatorStatus == 'Booted', simulatorId);
   }
 
-  Future<String> listExistingSimulators(
+  Future<String> _listExistingSimulators(
       int osMajorVersion, int osMinorVersion) async {
     final io.ProcessResult versionResult =
         await io.Process.run('xcrun', ['simctl', 'list']);
@@ -180,13 +163,52 @@ class IosSimulatorManager {
   }
 }
 
+/// A class that can be used to boot/shutdown an iOS Simulator.
 class IosSimulator {
-  final bool booted;
-  final String id;
-  IosSimulator(this.booted, this.id);
+  final String _id;
+  String get id => _id;
+
+  bool _booted;
+  bool get booted => _booted;
+
+  IosSimulator._(this._booted, this._id);
+
+  /// Boots the iOS Simulator using the simulator [_id].
+  ///
+  /// Uses `xcrun simctl boot` command to boot an iOS Simulator.
+  ///
+  /// If it is already booted the command will fail.
+  Future<void> boot() async {
+    final io.ProcessResult versionResult =
+        await io.Process.run('xcrun', ['simctl', 'boot', '$_id']);
+
+    if (versionResult.exitCode != 0) {
+      throw Exception('Failed to boot iOS simulators with id: $_id.');
+    }
+    this._booted = true;
+    return;
+  }
+
+  /// Shutsdown the iOS Simulator using the simulator [_id].
+  ///
+  /// Uses `xcrun simctl shutdown` command to boot an iOS Simulator.
+  ///
+  /// If the simulator is not booted, the command will fail.
+  Future<void> shutdown() async {
+    final io.ProcessResult versionResult =
+        await io.Process.run('xcrun', ['simctl', 'shutdown', '$_id']);
+
+    if (versionResult.exitCode != 0) {
+      throw Exception(
+          'Failed to shutdown iOS simulators with id: $_id.');
+    }
+
+    this._booted = false;
+    return;
+  }
 
   @override
   String toString() {
-    return 'Simulator id: $id status: $booted';
+    return 'iOS Simulator id: $_id status: $booted';
   }
 }
