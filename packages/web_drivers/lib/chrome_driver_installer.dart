@@ -58,7 +58,7 @@ class ChromeDriverInstaller {
     }
   }
 
-  void install({bool alwaysInstall = false}) async {
+  Future<void> install({bool alwaysInstall = false}) async {
     if (!isInstalled || alwaysInstall) {
       await _installDriver();
     } else {
@@ -67,7 +67,7 @@ class ChromeDriverInstaller {
     }
   }
 
-  void _installDriver() async {
+  Future<void> _installDriver() async {
     // If this method is called, clean the previous installations.
     if (isInstalled) {
       installation.deleteSync(recursive: true);
