@@ -11,3 +11,7 @@ chrome:
   76: '76.0.3809.126'
   75: '75.0.3770.140'
   74: '74.0.3729.6'
+## geckodriver is used for testing Firefox Browser. It works with multiple
+## Firefox Browser versions.
+## See: https://github.com/mozilla/geckodriver/releases
+gecko: 'v0.26.0'

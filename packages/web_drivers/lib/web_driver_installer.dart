@@ -5,6 +5,7 @@
 import 'dart:io' as io;
 
 import 'package:args/command_runner.dart';
+import 'package:web_driver_installer/firefox_driver_command.dart';
 
 import 'chrome_driver_command.dart';
 import 'safari_driver_command.dart';
@@ -15,6 +16,7 @@ CommandRunner runner = CommandRunner<bool>(
       'with flutter driver.',
 )
   ..addCommand(ChromeDriverCommand())
+  ..addCommand(FirefoxDriverCommand())
   ..addCommand(SafariDriverCommand());
 
 void main(List<String> args) async {
