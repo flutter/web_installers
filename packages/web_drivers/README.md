@@ -43,7 +43,7 @@ For releases see: https://github.com/mozilla/geckodriver/releases
 
 ```dart lib/web_driver_installer.dart firefoxdriver --driver-version="v0.25.0"```
 
-`always-install` and `install-only` commands can still be used for Firefox.
+Note that `always-install` and `install-only` commands can still be used for Firefox.
 
 ```dart lib/web_driver_installer.dart chromedriver --always-install```
 
