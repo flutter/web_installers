@@ -2,4 +2,5 @@
 *.packages
 *pubspec.lock
 chromedriver
+firefoxdriver
 .DS_Store

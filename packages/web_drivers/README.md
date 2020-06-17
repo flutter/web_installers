@@ -30,3 +30,21 @@ This will end with an error if the exiting version differs from the system versi
 **No-options also currently defaults to install and start Chrome Driver. It will be deprecated soon.**
 
 ```dart lib/web_driver_installer.dart &```
+
+**For Firefox Driver**
+
+To install and keep running:
+
+```dart lib/web_driver_installer.dart firefoxdriver&```
+
+Firefox uses gecko driver. The default is taken from driver_version.yaml file.
+One can provide different release versions for gecko driver.
+For releases see: https://github.com/mozilla/geckodriver/releases
+
+```dart lib/web_driver_installer.dart firefoxdriver --driver-version="v0.25.0"```
+
+`always-install` and `install-only` commands can still be used for Firefox.
+
+```dart lib/web_driver_installer.dart chromedriver --always-install```
+
+```dart lib/web_driver_installer.dart chromedriver --install-only```
