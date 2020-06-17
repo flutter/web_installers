@@ -2,36 +2,37 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:io' as io;
+
 import 'package:args/command_runner.dart';
 import 'package:web_driver_installer/firefox_driver_installer.dart';
 
 /// Wrapper class on top of [FirefoxDriverInstaller] to use it as a command.
-class FirefoxriverCommand extends Command<bool> {
+class FirefoxDriverCommand extends Command<bool> {
   @override
   String get description => 'Firefox Driver installer.';
 
   @override
   String get name => 'firefoxdriver';
 
-  final String defaultDriverVersion = 'fromlockfile';
+  static const String defaultDriverVersion = 'fromlockfile';
 
-  FirefoxriverCommand() {
+  FirefoxDriverCommand() {
     argParser
       ..addFlag('always-install',
           defaultsTo: false,
-          help: 'There might be an already installed version of the driver. '
-              'If one wants to overwrite it, set this flag')
-      ..addFlag(
-        'install-only',
-        defaultsTo: false,
-        help: 'Only installs the driver. Does not start it. Default is false',
-      )
+          help: 'Overwrites an existing driver installation, if any. There '
+              'might be an already installed version of the driver. This '
+              'flag will delete it before installing a new one.')
+      ..addFlag('install-only',
+          defaultsTo: false,
+          help: 'Only installs the driver. Does not start it. Default is false')
       ..addOption('driver-version',
           defaultsTo: defaultDriverVersion,
           help: 'Install the given release from the geckodriver releases. If '
-          'release version is not provided use version from the '
-          'driver_version.yaml. For releases see: '
-          'https://github.com/mozilla/geckodriver/releases');
+              'release version is not provided use version from the '
+              'driver_version.yaml. For releases see: '
+              'https://github.com/mozilla/geckodriver/releases');
   }
 
   /// If the gecko driver release version is provided as an argument,
@@ -56,8 +57,7 @@ class FirefoxriverCommand extends Command<bool> {
       }
       return true;
     } catch (e) {
-      print('Exception during install $e');
-      return false;
+      throw Exception('Exception during Firefox command: $e');
     }
   }
 

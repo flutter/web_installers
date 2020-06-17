@@ -13,19 +13,18 @@ class ChromeDriverCommand extends Command<bool> {
   @override
   String get name => 'chromedriver';
 
-  final String defaultDriverVersion = 'fromlockfile';
+  static const String defaultDriverVersion = 'fromlockfile';
 
   ChromeDriverCommand() {
     argParser
       ..addFlag('always-install',
           defaultsTo: false,
-          help: 'There might be an already installed version of the driver. '
-              'If one wants to overwrite it, set this flag')
-      ..addFlag(
-        'install-only',
-        defaultsTo: false,
-        help: 'Only installs the driver. Does not start it. Default is false',
-      )
+          help: 'Overwrites an existing driver installation, if any. There '
+              'might be an already installed version of the driver. This '
+              'flag will delete it before installing a new one.')
+      ..addFlag('install-only',
+          defaultsTo: false,
+          help: 'Only installs the driver. Does not start it. Default is false')
       ..addOption('driver-version',
           defaultsTo: defaultDriverVersion,
           help: 'Install the given version of the driver. If driver version is '

@@ -16,7 +16,7 @@ CommandRunner runner = CommandRunner<bool>(
       'with flutter driver.',
 )
   ..addCommand(ChromeDriverCommand())
-  ..addCommand(FirefoxriverCommand())
+  ..addCommand(FirefoxDriverCommand())
   ..addCommand(SafariDriverCommand());
 
 void main(List<String> args) async {
