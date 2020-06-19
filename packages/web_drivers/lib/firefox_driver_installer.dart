@@ -34,6 +34,7 @@ class FirefoxDriverInstaller {
       final YamlMap driverLock = DriverLock.instance.configuration;
       this.geckoDriverVersion = driverLock['gecko'] as String;
     }
+    this.geckoDriverVersion = geckoDriverVersion;
   }
 
   io.File driverDownload;
