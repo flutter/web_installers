@@ -114,6 +114,7 @@ class IosSimulatorManager {
     //   iPhone 8 Plus (170207A8-7631-4CBE-940E-86A7815AEB2B) (Shutdown)
     //   iPhone 11 (7AEC5FB9-E08A-4F7F-8CA2-1518CE3A3E0D) (Booted)
     //   iPhone 11 Pro (D8074C8B-35A5-4DA5-9AB2-4CE738A5E5FC) (Shutdown)
+    // -- Device Pairs --
     // Example output 2 (from Mac Web Engine try bots):
     // == Devices ==
     // -- iOS 13.0 --
@@ -132,16 +133,13 @@ class IosSimulatorManager {
     final String restOfTheOutput = simulatorsList
         .substring(indexOfVersionListStart + simulatorVersion.length);
     int indexOfNextVersion = restOfTheOutput.indexOf('--');
-    if(indexOfNextVersion == -1) {
+    if (indexOfNextVersion == -1) {
       // Search for `== Device Pairs ==`.
       indexOfNextVersion = restOfTheOutput.indexOf('==');
     }
-    if(indexOfNextVersion == -1) {
+    if (indexOfNextVersion == -1) {
       // Set to end of file.
       indexOfNextVersion = restOfTheOutput.length;
-    }
-    if (indexOfNextVersion == -1) {
-      throw Exception('Unexpected output from list call: $simulatorsList');
     }
 
     final String listOfPhones =
@@ -223,8 +221,7 @@ class IosSimulator {
         await io.Process.run('xcrun', ['simctl', 'shutdown', '$id']);
 
     if (versionResult.exitCode != 0) {
-      throw Exception(
-          'Failed to shutdown iOS simulators with id: $id.');
+      throw Exception('Failed to shutdown iOS simulators with id: $id.');
     }
 
     this._booted = false;
