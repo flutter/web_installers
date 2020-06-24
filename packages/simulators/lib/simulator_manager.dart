@@ -102,7 +102,7 @@ class IosSimulatorManager {
         await _listExistingSimulators(osMajorVersion, osMinorVersion);
 
     // The simulator list, have the version string followed by a list of phone
-    // names along with their ids and their statuses. Example output:
+    // names along with their ids and their statuses. Example output 1:
     // -- iOS 13.5 --
     //   iPhone 8 (2A437C91-3B85-4D7B-BB91-32561DA07B85) (Shutdown)
     //   iPhone 8 Plus (170207A8-7631-4CBE-940E-86A7815AEB2B) (Shutdown)
@@ -114,11 +114,36 @@ class IosSimulatorManager {
     //   iPhone 8 Plus (170207A8-7631-4CBE-940E-86A7815AEB2B) (Shutdown)
     //   iPhone 11 (7AEC5FB9-E08A-4F7F-8CA2-1518CE3A3E0D) (Booted)
     //   iPhone 11 Pro (D8074C8B-35A5-4DA5-9AB2-4CE738A5E5FC) (Shutdown)
+    // Example output 2 (from Mac Web Engine try bots):
+    // == Devices ==
+    // -- iOS 13.0 --
+    //     iPhone 8 (C142C9F5-C26E-4EB5-A2B8-915D5BD62FA5) (Shutdown)
+    //     iPhone 8 Plus (C1FE8FAA-5797-478E-8BEE-D7AD4811F08C) (Shutdown)
+    //     iPhone 11 (28A3E6C0-76E7-4EE3-9B34-B059C4BBE5CA) (Shutdown)
+    //     iPhone 11 Pro (0AD4BBA5-7BE7-415D-B9FD-D962FA8E1782) (Shutdown)
+    //     iPhone 11 Pro Max (1280DE05-B334-4E60-956F-4A62220DEFA3) (Shutdown)
+    //     iPad Pro (9.7-inch) (EDE46501-CB2B-4EA4-8B5C-13FAC6F2EC91) (Shutdown)
+    //     iPad Pro (11-inch) (E0B89C9C-6200-495C-B18B-0078CCAAC688) (Shutdown)
+    //     iPad Pro (12.9-inch) (3rd generation) (DB3EB7A8-C4D2-4F86-AFC1-D652FB0579E8) (Shutdown)
+    //     iPad Air (3rd generation) (9237DCD8-8F0E-40A6-96DF-B33C915AFE1B) (Shutdown)
+    // == Device Pairs ==
     final int indexOfVersionListStart =
         simulatorsList.indexOf(simulatorVersion);
     final String restOfTheOutput = simulatorsList
         .substring(indexOfVersionListStart + simulatorVersion.length);
-    final int indexOfNextVersion = restOfTheOutput.indexOf('--');
+    int indexOfNextVersion = restOfTheOutput.indexOf('--');
+    if(indexOfNextVersion == -1) {
+      // Search for `== Device Pairs ==`.
+      indexOfNextVersion = restOfTheOutput.indexOf('==');
+    }
+    if(indexOfNextVersion == -1) {
+      // Set to end of file.
+      indexOfNextVersion = restOfTheOutput.length;
+    }
+    if (indexOfNextVersion == -1) {
+      throw Exception('Unexpected output from list call: $simulatorsList');
+    }
+
     final String listOfPhones =
         restOfTheOutput.substring(0, indexOfNextVersion);
 
