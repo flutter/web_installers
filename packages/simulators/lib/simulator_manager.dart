@@ -228,6 +228,22 @@ class IosSimulator {
     return;
   }
 
+  /// Take the screenshot of the simulator.
+  ///
+  /// This method takes screenshot of the entire simulator, not the
+  /// "open application's content".
+  Future<void> takeScreenshot(
+      String fileName, io.Directory workingDirectory) async {
+    final io.ProcessResult versionResult = await io.Process.run(
+        'xcrun', ['simctl', 'io', id, 'screenshot', fileName],
+        workingDirectory: workingDirectory.path);
+
+    if (versionResult.exitCode != 0) {
+      throw Exception('Failed to run xcrun screenshot on iOS simulator for '
+          'simulator id: $id');
+    }
+  }
+
   @override
   String toString() {
     return 'iOS Simulator id: $id status: $booted';
