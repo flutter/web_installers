@@ -230,7 +230,7 @@ class IosSimulator {
 
   /// Take the screenshot of the simulator.
   ///
-  /// Note that, this method takes screenshot of the entire simulator, not the
+  /// This method takes screenshot of the entire simulator, not the
   /// "open application's content".
   Future<void> takeScreenshot(
       String fileName, io.Directory workingDirectory) async {
@@ -239,12 +239,6 @@ class IosSimulator {
         workingDirectory: workingDirectory.path);
 
     if (versionResult.exitCode != 0) {
-      io.stdout
-          .writeln('Info: Failed to run xcrun screenshot on iOS simulator. '
-              'Simulator id: $id');
-      io.stderr
-          .writeln('ERROR: Failed to run xcrun screenshot on iOS simulator. '
-              'Simulator id: $id');
       throw Exception('Failed to run xcrun screenshot on iOS simulator for '
           'simulator id: $id');
     }
