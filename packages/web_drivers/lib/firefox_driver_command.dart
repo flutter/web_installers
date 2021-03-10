@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:io' as io;
-
 import 'package:args/command_runner.dart';
 import 'package:web_driver_installer/firefox_driver_installer.dart';
 
@@ -40,12 +38,12 @@ class FirefoxDriverCommand extends Command<bool> {
   /// file.
   ///
   /// See [_initializeFirefoxDriverInstaller].
-  FirefoxDriverInstaller firefoxDriverInstaller;
+  late FirefoxDriverInstaller firefoxDriverInstaller;
 
   @override
   Future<bool> run() async {
-    final bool installOnly = argResults['install-only'];
-    final bool alwaysInstall = argResults['always-install'];
+    final bool installOnly = argResults!['install-only'];
+    final bool alwaysInstall = argResults!['always-install'];
 
     _initializeFirefoxDriverInstaller();
 
@@ -62,7 +60,7 @@ class FirefoxDriverCommand extends Command<bool> {
   }
 
   void _initializeFirefoxDriverInstaller() {
-    final String driverVersion = argResults['driver-version'];
+    final String driverVersion = argResults!['driver-version'];
     if (driverVersion == defaultDriverVersion) {
       firefoxDriverInstaller = FirefoxDriverInstaller();
     } else {

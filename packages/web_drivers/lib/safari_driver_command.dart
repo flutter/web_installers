@@ -29,12 +29,12 @@ class SafariDriverCommand extends Command<bool> {
 
   @override
   Future<bool> run() async {
-    final String driverVersion = argResults['driver-version'];
+    final String driverVersion = argResults!['driver-version'];
     try {
       await safariDriverRunner.start(version: driverVersion);
       return true;
     } catch (e) {
-      print('Exception during running the safari driver: ${e.message}');
+      print('Exception during running the safari driver: $e');
       return false;
     }
   }
