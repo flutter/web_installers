@@ -80,7 +80,16 @@ class ChromeDriverInstaller {
       }
 
       final YamlMap browserLock = DriverLock.instance.configuration;
-      chromeDriverVersion = browserLock['chrome'][chromeVersion] as String;
+      final YamlMap chromeDrivers = browserLock['chrome'];
+      final String? chromeDriverVersion = chromeDrivers[chromeVersion];
+      if (chromeDriverVersion == null) {
+        throw Exception(
+          'No known chromedriver version for Chrome version $chromeVersion.\n'
+          'Known versions are:\n${chromeDrivers.entries.map((e) => '${e.key}: ${e.value}').join('\n')}',
+        );
+      } else {
+        this.chromeDriverVersion = chromeDriverVersion;
+      }
     }
 
     try {
