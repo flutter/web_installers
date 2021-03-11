@@ -25,7 +25,7 @@ class FirefoxDriverInstaller {
   /// This is not the version of Firefox Browser.
   ///
   /// Geckodriver works for multiple versions of Firefox Browser.
-  String geckoDriverVersion;
+  late String geckoDriverVersion;
 
   FirefoxDriverInstaller({String geckoDriverVersion = ''}) {
     if (geckoDriverVersion.isEmpty) {
@@ -37,7 +37,7 @@ class FirefoxDriverInstaller {
     this.geckoDriverVersion = geckoDriverVersion;
   }
 
-  io.File driverDownload;
+  io.File? driverDownload;
 
   String get downloadUrl => '$geckoDriverReleasesUrl/${driverUrlPath()}';
 
@@ -80,9 +80,9 @@ class FirefoxDriverInstaller {
     }
 
     if (io.Platform.isWindows) {
-      await _uncompressWithZip(driverDownload);
+      await _uncompressWithZip(driverDownload!);
     } else {
-      await _uncompressWithTar(driverDownload);
+      await _uncompressWithTar(driverDownload!);
     }
   }
 
@@ -112,14 +112,14 @@ class FirefoxDriverInstaller {
   /// Uncompress the downloaded driver file.
   Future<void> _uncompressWithZip(io.File downloadedFile) async {
     final io.ProcessResult unzipResult = await io.Process.run('unzip', <String>[
-      driverDownload.path,
+      driverDownload!.path,
       '-d',
       driverDir.path,
     ]);
 
     if (unzipResult.exitCode != 0) {
       throw Exception(
-          'Failed to unzip the downloaded gecko driver ${driverDownload.path}.\n'
+          'Failed to unzip the downloaded gecko driver ${driverDownload!.path}.\n'
           'With the driver path ${driverDir.path}\n'
           'The unzip process exited with code ${unzipResult.exitCode}.');
     }

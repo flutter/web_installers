@@ -15,7 +15,7 @@ class SafariDriverRunner {
   /// version and throw and exception the versions do not match.
   ///
   /// If the operating system is not macOS, the method will throw an exception.
-  Future<void> start({String version}) async {
+  Future<void> start({String version = 'system'}) async {
     if (!io.Platform.isMacOS) {
       throw AssertionError('The operating system must be MacOS: '
           '${io.Platform.operatingSystem}');

@@ -17,15 +17,12 @@ class ChromeDriverInstaller {
   /// Installation directory for Chrome Driver.
   final io.Directory driverDir = io.Directory('chromedriver');
 
-  /// File that should contain Chrome Driver.
-  io.File exitingFile;
-
   static const String chromeDriverUrl =
       'https://chromedriver.storage.googleapis.com/';
 
   String chromeDriverVersion;
 
-  io.File driverDownload;
+  io.File? driverDownload;
 
   String get downloadUrl =>
       '$chromeDriverUrl$chromeDriverVersion/${driverName()}';
@@ -78,12 +75,21 @@ class ChromeDriverInstaller {
     if (chromeDriverVersion.isEmpty) {
       final int chromeVersion = await _querySystemChromeVersion();
 
-      if (chromeVersion == null || chromeVersion < 74) {
+      if (chromeVersion < 74) {
         throw Exception('Unsupported Chrome version: $chromeVersion');
       }
 
       final YamlMap browserLock = DriverLock.instance.configuration;
-      chromeDriverVersion = browserLock['chrome'][chromeVersion] as String;
+      final YamlMap chromeDrivers = browserLock['chrome'];
+      final String? chromeDriverVersion = chromeDrivers[chromeVersion];
+      if (chromeDriverVersion == null) {
+        throw Exception(
+          'No known chromedriver version for Chrome version $chromeVersion.\n'
+          'Known versions are:\n${chromeDrivers.entries.map((e) => '${e.key}: ${e.value}').join('\n')}',
+        );
+      } else {
+        this.chromeDriverVersion = chromeDriverVersion;
+      }
     }
 
     try {
@@ -167,14 +173,14 @@ class ChromeDriverInstaller {
   /// Uncompress the downloaded driver file.
   Future<void> _uncompress() async {
     final io.ProcessResult unzipResult = await io.Process.run('unzip', <String>[
-      driverDownload.path,
+      driverDownload!.path,
       '-d',
       driverDir.path,
     ]);
 
     if (unzipResult.exitCode != 0) {
       throw Exception(
-          'Failed to unzip the downloaded Chrome driver ${driverDownload.path}.\n'
+          'Failed to unzip the downloaded Chrome driver ${driverDownload!.path}.\n'
           'With the driver path ${driverDir.path}\n'
           'The unzip process exited with code ${unzipResult.exitCode}.');
     }

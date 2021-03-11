@@ -35,12 +35,12 @@ class ChromeDriverCommand extends Command<bool> {
   /// otherwise use the `driver_version.yaml` file.
   ///
   /// See [_initializeChromeDriverInstaller].
-  ChromeDriverInstaller chromeDriverInstaller;
+  late ChromeDriverInstaller chromeDriverInstaller;
 
   @override
   Future<bool> run() async {
-    final bool installOnly = argResults['install-only'];
-    final bool alwaysInstall = argResults['always-install'];
+    final bool installOnly = argResults!['install-only'];
+    final bool alwaysInstall = argResults!['always-install'];
 
     _initializeChromeDriverInstaller();
 
@@ -58,7 +58,7 @@ class ChromeDriverCommand extends Command<bool> {
   }
 
   void _initializeChromeDriverInstaller() {
-    final String driverVersion = argResults['driver-version'];
+    final String driverVersion = argResults!['driver-version'];
     if (driverVersion == defaultDriverVersion) {
       chromeDriverInstaller = ChromeDriverInstaller();
     } else {
